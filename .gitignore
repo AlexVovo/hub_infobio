@@ -1,0 +1,59 @@
+# Flutter/Dart
+.dart_tool/
+.build/
+.packages
+.pub/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins-cmake
+generated_plugin_registrant.dart
+
+# Android
+*.iml
+.gradle/
+local.properties
+*.apk
+*.aar
+*.keystore
+
+# iOS
+Pods/
+*.xcworkspace
+*.xcconfig
+*.lock
+DerivedData/
+Flutter/Flutter.framework
+Flutter/Flutter.podspec
+
+# macOS
+*.xcworkspace
+*.xcodeproj/project.xcworkspace/
+Flutter/Flutter.framework
+
+# Linux
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+
+# Windows
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+
+# Web
+/web/.dart_tool/
+
+# VS Code
+.vscode/
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
