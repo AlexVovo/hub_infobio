@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const BioHubApp());
 }
 
@@ -13,7 +20,7 @@ class BioHubApp extends StatefulWidget {
 }
 
 class _BioHubAppState extends State<BioHubApp> {
-  ThemeMode _themeMode = ThemeMode.system; // modo inicial automático
+  ThemeMode _themeMode = ThemeMode.system;
 
   void _toggleTheme() {
     setState(() {
@@ -52,11 +59,10 @@ class _BioHubAppState extends State<BioHubApp> {
   @override
   Widget build(BuildContext context) {
     return AnimatedTheme(
-      // ✨ Animação de transição suave entre temas
       data: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
       ),
-      duration: const Duration(milliseconds: 500), // tempo da animação
+      duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
       child: MaterialApp(
         title: 'Hub de Bioinformática',
@@ -81,7 +87,7 @@ class _BioHubAppState extends State<BioHubApp> {
           transitionBuilder: (child, animation) =>
               FadeTransition(opacity: animation, child: child),
           child: HomePage(
-            key: ValueKey(_themeMode), // garante que o fade funcione
+            key: ValueKey(_themeMode),
             onToggleTheme: _toggleTheme,
             themeIcon: _themeIcon,
             themeTooltip: _themeTooltip,
@@ -129,20 +135,33 @@ class HomePage extends StatelessWidget {
       'icone': Icons.memory,
       'cor': Colors.green,
     },
+    {
+      'titulo': 'Projetos ICI',
+      'descricao':
+          'Iniciativas e pesquisas do Instituto de Ciências Integradas.',
+      'icone': Icons.build_circle,
+      'cor': Colors.blueGrey,
+    },
+    {
+      'titulo': 'Artigos',
+      'descricao':
+          'Publicações científicas e artigos relevantes em bioinformática.',
+      'icone': Icons.book,
+      'cor': Colors.lightBlue,
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsividade
     int crossAxisCount;
     if (screenWidth < 600) {
-      crossAxisCount = 2; // Celulares
+      crossAxisCount = 2;
     } else if (screenWidth < 1000) {
-      crossAxisCount = 3; // Tablets
+      crossAxisCount = 3;
     } else {
-      crossAxisCount = 4; // Web
+      crossAxisCount = 4;
     }
 
     return Scaffold(
@@ -186,16 +205,35 @@ class HomePage extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          transitionDuration: const Duration(milliseconds: 400),
-                          pageBuilder: (_, __, ___) =>
-                              ProjetoDetalhesPage(projeto: projeto),
-                          transitionsBuilder: (context, animation, _, child) =>
-                              FadeTransition(opacity: animation, child: child),
-                        ),
-                      );
+                      if (projeto['titulo'] == 'Artigos') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ArtigosPage(
+                              cor: projeto['cor'],
+                              icone: projeto['icone'],
+                              titulo: projeto['titulo'],
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration: const Duration(
+                              milliseconds: 400,
+                            ),
+                            pageBuilder: (_, __, ___) =>
+                                ProjetoDetalhesPage(projeto: projeto),
+                            transitionsBuilder:
+                                (context, animation, _, child) =>
+                                    FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    ),
+                          ),
+                        );
+                      }
                     },
                     child: Card(
                       color: isDark
@@ -324,6 +362,132 @@ class ProjetoDetalhesPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// 🔹 Versão real da ArtigosPage com upload/download
+class ArtigosPage extends StatefulWidget {
+  final Color cor;
+  final IconData icone;
+  final String titulo;
+
+  const ArtigosPage({
+    super.key,
+    required this.cor,
+    required this.icone,
+    required this.titulo,
+  });
+
+  @override
+  State<ArtigosPage> createState() => _ArtigosPageState();
+}
+
+class _ArtigosPageState extends State<ArtigosPage> {
+  final FirebaseStorage storage = FirebaseStorage.instance;
+  List<Reference> artigos = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadArtigos();
+  }
+
+  Future<void> _loadArtigos() async {
+    setState(() => isLoading = true);
+    final listResult = await storage.ref('artigos').listAll();
+    setState(() {
+      artigos = listResult.items;
+      isLoading = false;
+    });
+  }
+
+  Future<void> _uploadArquivo() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (result != null && result.files.single.path != null) {
+      final file = File(result.files.single.path!);
+      final fileName = result.files.single.name;
+
+      final uploadTask = storage.ref('artigos/$fileName').putFile(file);
+
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          content: StreamBuilder<TaskSnapshot>(
+            stream: uploadTask.snapshotEvents,
+            builder: (context, snapshot) {
+              double progress = 0;
+              if (snapshot.hasData) {
+                progress =
+                    snapshot.data!.bytesTransferred / snapshot.data!.totalBytes;
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Enviando $fileName'),
+                  const SizedBox(height: 20),
+                  LinearProgressIndicator(value: progress),
+                  const SizedBox(height: 10),
+                  Text('${(progress * 100).toStringAsFixed(0)}%'),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+
+      await uploadTask;
+      Navigator.pop(context); // fecha o diálogo
+      _loadArtigos(); // recarrega a lista
+    }
+  }
+
+  Future<void> _downloadArquivo(Reference ref) async {
+    final url = await ref.getDownloadURL();
+    // Aqui você pode abrir o PDF em visualizador ou baixar
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('URL do PDF: $url')));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.titulo),
+        backgroundColor: widget.cor,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.upload_file),
+            onPressed: _uploadArquivo,
+            tooltip: 'Enviar PDF',
+          ),
+        ],
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: artigos.length,
+              itemBuilder: (context, index) {
+                final artigo = artigos[index];
+                return Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.picture_as_pdf),
+                    title: Text(artigo.name),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.download),
+                      onPressed: () => _downloadArquivo(artigo),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

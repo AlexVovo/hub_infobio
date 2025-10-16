@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "138946141455",
+    "project_id": "hubinfobio",
+    "storage_bucket": "hubinfobio.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138946141455:android:43fa544c19265af94a727a",
+        "android_client_info": {
+          "package_name": "com.example.hub_infobio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQo3b23reCFZEQMqUyOfW9ToP9jZtRTE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
