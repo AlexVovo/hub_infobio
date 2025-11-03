@@ -1,93 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:hub_infobio/views/artigos_page.dart';
-import '../models/projeto_model.dart';
+import 'package:hub_infobio/views/home_view.dart';
 
-class DetalhesView extends StatelessWidget {
-  final Projeto projeto;
-  const DetalhesView({super.key, required this.projeto});
+class ProjetoDetalhesPage extends StatelessWidget {
+  final Map<String, dynamic> projeto;
+  const ProjetoDetalhesPage({super.key, required this.projeto});
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final List<Map<String, dynamic>> subprojetos =
+        (projeto['subprojetos'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(projeto.titulo),
-        backgroundColor: projeto.cor,
+        title: Text(projeto['titulo']),
+        backgroundColor: projeto['cor'],
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Icon(projeto.icone, size: 80, color: projeto.cor),
+        child: subprojetos.isEmpty
+            ? Center(
+                child: Text(
+                  projeto['descricao'],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  projeto.titulo,
-                  style: TextStyle(
-                    fontSize: screenWidth < 400 ? 20 : 24,
-                    fontWeight: FontWeight.bold,
-                    color: projeto.cor,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  projeto.descricao,
-                  style: TextStyle(
-                    fontSize: screenWidth < 400 ? 14 : 16,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Center(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: projeto.cor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (projeto.titulo == 'Artigos') {
+              )
+            : ListView.builder(
+                itemCount: subprojetos.length,
+                itemBuilder: (context, index) {
+                  final sub = subprojetos[index];
+                  return Card(
+                    child: ListTile(
+                      leading: Icon(sub['icone'], color: projeto['cor']),
+                      title: Text(sub['nome']),
+                      subtitle: Text(sub['descricao']),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ArtigosPage(
-                              cor: projeto.cor,
-                              icone: projeto.icone,
-                              titulo: projeto.titulo,
+                            builder: (_) => SubprojetoDetalhesPage(
+                              titulo: sub['nome'],
+                              descricao: sub['descricao'],
+                              imagem: sub['imagem'],
+                              icone: sub['icone'],
+                              cor: projeto['cor'],
                             ),
                           ),
                         );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Funcionalidade em desenvolvimento 🔬',
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.link),
-                    label: const Text('Ver mais detalhes'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+                      },
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'artigos_page.dart'; // Importe sua página de artigos
+import 'artigos_page.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onToggleTheme;
@@ -45,6 +45,50 @@ class HomePage extends StatelessWidget {
           'Iniciativas e pesquisas do Instituto de Ciências Integradas.',
       'icone': Icons.build_circle,
       'cor': Colors.blueGrey,
+      'subprojetos': [
+        {
+          'nome': 'Genômica de Tumores Pediátricos',
+          'descricao':
+              'Estudo genético de tumores pediátricos para identificar biomarcadores e padrões mutacionais.',
+          'icone': Icons.child_care,
+          'imagem': 'assets/images/tumores_pediatricos.jpeg',
+        },
+        {
+          'nome': 'Plataforma de Bioinformática Integrada',
+          'descricao':
+              'Desenvolvimento de um ecossistema integrado para análise e visualização de dados biológicos.',
+          'icone': Icons.integration_instructions,
+          'imagem': 'assets/images/plataforma_bioinfo.jpg',
+        },
+        {
+          'nome': 'IA em Diagnóstico Molecular',
+          'descricao':
+              'Aplicação de algoritmos de IA no diagnóstico molecular e predição de terapias personalizadas.',
+          'icone': Icons.psychology,
+          'imagem': 'assets/images/ia_diagnostico.jpg',
+        },
+        {
+          'nome': 'Estudos de Microbioma Humano',
+          'descricao':
+              'Pesquisas sobre o papel do microbioma humano na saúde e nas doenças oncológicas.',
+          'icone': Icons.biotech,
+          'imagem': 'assets/images/microbioma.jpg',
+        },
+        {
+          'nome': 'Banco de Dados Oncológicos (RHC/TCGA)',
+          'descricao':
+              'Organização e integração de dados clínicos e genômicos em repositórios oncológicos.',
+          'icone': Icons.storage,
+          'imagem': 'assets/images/banco_dados.jpg',
+        },
+        {
+          'nome': 'Teleonco Capacita',
+          'descricao':
+              'Capacitação profissional em oncologia via plataformas digitais e teleducação.',
+          'icone': Icons.computer,
+          'imagem': 'assets/images/teleonco.jpg',
+        },
+      ],
     },
     {
       'titulo': 'Artigos',
@@ -59,14 +103,13 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsividade
     int crossAxisCount;
     if (screenWidth < 600) {
-      crossAxisCount = 2; // Celulares
+      crossAxisCount = 2;
     } else if (screenWidth < 1000) {
-      crossAxisCount = 3; // Tablets
+      crossAxisCount = 3;
     } else {
-      crossAxisCount = 4; // Web
+      crossAxisCount = 4;
     }
 
     return Scaffold(
@@ -86,113 +129,76 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        transitionBuilder: (child, animation) =>
-            FadeTransition(opacity: animation, child: child),
-        child: LayoutBuilder(
-          key: ValueKey(screenWidth),
-          builder: (context, constraints) {
-            return Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  childAspectRatio: constraints.maxWidth < 400 ? 0.8 : 1,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: projetos.length,
-                itemBuilder: (context, index) {
-                  final projeto = projetos[index];
-                  final theme = Theme.of(context);
-                  final isDark = theme.brightness == Brightness.dark;
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: screenWidth < 400 ? 0.8 : 1,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: projetos.length,
+          itemBuilder: (context, index) {
+            final projeto = projetos[index];
+            final theme = Theme.of(context);
+            final isDark = theme.brightness == Brightness.dark;
 
-                  return GestureDetector(
-                    onTap: () {
-                      if (projeto['titulo'] == 'Artigos') {
-                        // Navega diretamente para ArtigosPage
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            transitionDuration: const Duration(
-                              milliseconds: 400,
-                            ),
-                            pageBuilder: (_, __, ___) => ArtigosPage(
-                              cor: projeto['cor'],
-                              icone: projeto['icone'],
-                              titulo: projeto['titulo'],
-                            ),
-                            transitionsBuilder:
-                                (context, animation, _, child) =>
-                                    FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                          ),
-                        );
-                      } else {
-                        // Mantém navegação para detalhes dos outros projetos
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            transitionDuration: const Duration(
-                              milliseconds: 400,
-                            ),
-                            pageBuilder: (_, __, ___) =>
-                                ProjetoDetalhesPage(projeto: projeto),
-                            transitionsBuilder:
-                                (context, animation, _, child) =>
-                                    FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                          ),
-                        );
-                      }
-                    },
-                    child: Card(
-                      color: isDark
-                          ? projeto['cor'].withOpacity(0.25)
-                          : projeto['cor'].withOpacity(0.1),
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              projeto['icone'],
-                              size: 50,
-                              color: projeto['cor'],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              projeto['titulo'],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenWidth < 400 ? 14 : 16,
-                                color: projeto['cor'],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              projeto['descricao'],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: screenWidth < 400 ? 11 : 13,
-                              ),
-                            ),
-                          ],
-                        ),
+            return GestureDetector(
+              onTap: () {
+                if (projeto['titulo'] == 'Artigos') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ArtigosPage(
+                        cor: projeto['cor'],
+                        icone: projeto['icone'],
+                        titulo: projeto['titulo'],
                       ),
                     ),
                   );
-                },
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProjetoDetalhesPage(projeto: projeto),
+                    ),
+                  );
+                }
+              },
+              child: Card(
+                color: isDark
+                    ? projeto['cor'].withOpacity(0.25)
+                    : projeto['cor'].withOpacity(0.1),
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(projeto['icone'], size: 50, color: projeto['cor']),
+                      const SizedBox(height: 12),
+                      Text(
+                        projeto['titulo'],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth < 400 ? 14 : 16,
+                          color: projeto['cor'],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        projeto['descricao'],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: screenWidth < 400 ? 11 : 13),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
@@ -202,14 +208,15 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// Página de detalhes para outros projetos
+/// 🔹 Tela de detalhes dos projetos principais
 class ProjetoDetalhesPage extends StatelessWidget {
   final Map<String, dynamic> projeto;
   const ProjetoDetalhesPage({super.key, required this.projeto});
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final List<Map<String, dynamic>> subprojetos =
+        (projeto['subprojetos'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -217,66 +224,109 @@ class ProjetoDetalhesPage extends StatelessWidget {
         backgroundColor: projeto['cor'],
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Icon(
-                    projeto['icone'],
-                    size: 80,
-                    color: projeto['cor'],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  projeto['titulo'],
-                  style: TextStyle(
-                    fontSize: screenWidth < 400 ? 20 : 24,
-                    fontWeight: FontWeight.bold,
-                    color: projeto['cor'],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
+        child: subprojetos.isEmpty
+            ? Center(
+                child: Text(
                   projeto['descricao'],
-                  style: TextStyle(
-                    fontSize: screenWidth < 400 ? 14 : 16,
-                    height: 1.4,
-                  ),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 30),
-                Center(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: projeto['cor'],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+              )
+            : ListView.builder(
+                itemCount: subprojetos.length,
+                itemBuilder: (context, index) {
+                  final sub = subprojetos[index];
+                  return Card(
+                    child: ListTile(
+                      leading: Icon(sub['icone'], color: projeto['cor']),
+                      title: Text(sub['nome']),
+                      subtitle: Text(sub['descricao']),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SubprojetoDetalhesPage(
+                              titulo: sub['nome'],
+                              descricao: sub['descricao'],
+                              imagem: sub['imagem'],
+                              icone: sub['icone'],
+                              cor: projeto['cor'],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Funcionalidade em desenvolvimento 🔬'),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.link),
-                    label: const Text('Ver mais detalhes'),
-                  ),
+                  );
+                },
+              ),
+      ),
+    );
+  }
+}
+
+/// 🔹 Tela detalhada de cada subprojeto
+class SubprojetoDetalhesPage extends StatelessWidget {
+  final String titulo;
+  final String descricao;
+  final String imagem;
+  final IconData icone;
+  final Color cor;
+
+  const SubprojetoDetalhesPage({
+    super.key,
+    required this.titulo,
+    required this.descricao,
+    required this.imagem,
+    required this.icone,
+    required this.cor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(titulo),
+        backgroundColor: cor,
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icone, size: 80, color: cor),
+            const SizedBox(height: 20),
+            if (imagem.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  imagem,
+                  fit: BoxFit.cover,
+                  width: screenWidth * 0.8,
                 ),
-              ],
+              ),
+            const SizedBox(height: 20),
+            Text(
+              titulo,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: cor,
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+            Text(
+              descricao,
+              textAlign: TextAlign.justify,
+              style: const TextStyle(fontSize: 16, height: 1.5),
+            ),
+          ],
         ),
       ),
     );

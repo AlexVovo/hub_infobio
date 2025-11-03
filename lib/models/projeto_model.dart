@@ -7,6 +7,7 @@ class Projeto {
   final int iconeCodePoint; // armazenamos o código do ícone
   final String iconeFontFamily; // "FontAwesomeSolid" ou "MaterialIcons"
   final Color cor;
+  final List<String>? subprojetos;
 
   Projeto({
     required this.titulo,
@@ -14,6 +15,7 @@ class Projeto {
     required this.iconeCodePoint,
     required this.iconeFontFamily,
     required this.cor,
+    required this.subprojetos,
   });
 
   // Converte Firestore -> Projeto
@@ -24,6 +26,7 @@ class Projeto {
       iconeCodePoint: map['iconeCodePoint'] ?? 0,
       iconeFontFamily: map['iconeFontFamily'] ?? 'MaterialIcons',
       cor: Color(map['cor'] ?? 0xFF000000),
+      subprojetos: [],
     );
   }
 
