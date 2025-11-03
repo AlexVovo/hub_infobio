@@ -469,6 +469,7 @@ class _ArtigosPageState extends State<ArtigosPage> {
           ),
         ],
       ),
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(

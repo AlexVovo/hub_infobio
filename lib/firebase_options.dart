@@ -83,4 +83,5 @@ class DefaultFirebaseOptions {
     authDomain: 'hubinfobio.firebaseapp.com',
     storageBucket: 'hubinfobio.firebasestorage.app',
   );
+
 }
