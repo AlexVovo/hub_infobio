@@ -188,6 +188,20 @@ class HomePage extends StatelessWidget {
       'icone': Icons.book,
       'cor': Colors.lightBlue,
     },
+    {
+      'titulo': 'BioInfo Academy',
+      'descricao':
+          'Explore o conhecimento com a BioInfo Academy: um espaço dedicado a tutoriais, aulas, programação e discussões em bioinformática.',
+      'icone': Icons.book,
+      'cor': Colors.limeAccent,
+    },
+    {
+      'titulo': 'BioInfo Coletas',
+      'descricao':
+          'Informações e orientações sobre coletas biológicas, como saliva e outras amostras para análise em bioinformática.',
+      'icone': Icons.biotech,
+      'cor': Colors.deepPurpleAccent,
+    },
   ];
 
   @override
