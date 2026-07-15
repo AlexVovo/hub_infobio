@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hub_infobio/views/artigos_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -171,10 +172,10 @@ class HomePage extends StatelessWidget {
           'icone': Icons.storage,
         },
         {
-          'nome': 'Teleonco Capacita',
-          'descricao':
-              'Capacitação profissional em oncologia via plataformas digitais e teleducação.',
-          'icone': Icons.computer,
+          'nome': 'Projeto Heredograma',
+          'descricao': 'Projeto voltado à criação e análise de heredogramas.',
+          'icone': Icons.account_tree,
+          'link': 'https://example.com/projeto-heredograma',
         },
       ],
     },
@@ -366,6 +367,7 @@ class ProjetoDetalhesPage extends StatelessWidget {
                             descricao: sub['descricao'],
                             icone: sub['icone'],
                             cor: projeto['cor'],
+                            link: sub['link'],
                           ),
                         ),
                       );
@@ -384,6 +386,7 @@ class SubprojetoDetalhesPage extends StatelessWidget {
   final String descricao;
   final IconData icone;
   final Color cor;
+  final String? link;
 
   const SubprojetoDetalhesPage({
     super.key,
@@ -391,7 +394,18 @@ class SubprojetoDetalhesPage extends StatelessWidget {
     required this.descricao,
     required this.icone,
     required this.cor,
+    this.link,
   });
+
+  Future<void> _abrirLink(BuildContext context) async {
+    final uri = Uri.parse(link!);
+    if (!await launchUrl(uri)) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível abrir o link.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -423,6 +437,14 @@ class SubprojetoDetalhesPage extends StatelessWidget {
               textAlign: TextAlign.justify,
               style: const TextStyle(fontSize: 16, height: 1.5),
             ),
+            if (link != null) ...[
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () => _abrirLink(context),
+                icon: const Icon(Icons.open_in_new),
+                label: const Text('Acessar projeto'),
+              ),
+            ],
           ],
         ),
       ),
